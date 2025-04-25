@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.7.1
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - target: 9200
+        published: 9200
+        protocol: tcp
+        mode: host
+    deploy:
+      restart_policy:
+        condition: any
+
+  kibana:
+    image: kibana:8.7.1
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - target: 5601
+        published: 5601
+        protocol: tcp
+        mode: host
+    depends_on:
+      - elasticsearch
+    deploy:
+      restart_policy:
+        condition: any
+
+  fluentd:
+    image: y2-centralized-logger-fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    ports:
+      - target: 24224
+        published: 24224
+        protocol: tcp
+        mode: host
+      - target: 24224
+        published: 24224
+        protocol: udp
+        mode: host
+    depends_on:
+      - elasticsearch
+    deploy:
+      restart_policy:
+        condition: any
+
+volumes:
+  esdata:
