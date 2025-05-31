@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   elasticsearch:
     image: elasticsearch:8.7.1
@@ -8,6 +6,8 @@ services:
       - xpack.security.enabled=false
     volumes:
       - esdata:/usr/share/elasticsearch/data
+    networks:
+      - ${DESIRED_NETWORK}
     ports:
       - target: 9200
         published: 9200
@@ -21,6 +21,8 @@ services:
     image: kibana:8.7.1
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - ${DESIRED_NETWORK}
     ports:
       - target: 5601
         published: 5601
@@ -36,6 +38,8 @@ services:
     image: y2-centralized-logger-fluentd
     volumes:
       - ./fluentd/conf:/fluentd/etc
+    networks:
+      - ${DESIRED_NETWORK}
     ports:
       - target: 24224
         published: 24224
@@ -53,3 +57,7 @@ services:
 
 volumes:
   esdata:
+
+networks:
+  ${DESIRED_NETWORK}:
+    external: true
