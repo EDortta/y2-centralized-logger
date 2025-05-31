@@ -14,6 +14,8 @@ services:
         protocol: tcp
         mode: host
     deploy:
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: any
 
@@ -31,11 +33,13 @@ services:
     depends_on:
       - elasticsearch
     deploy:
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: any
 
   fluentd:
-    image: y2-centralized-logger-fluentd
+    image: registry.authfy.com.br:5152/stg_y2_fluentd:1.10.18
     volumes:
       - ./fluentd/conf:/fluentd/etc
     networks:
@@ -51,7 +55,10 @@ services:
         mode: host
     depends_on:
       - elasticsearch
+
     deploy:
+      mode: replicated
+      replicas: 1
       restart_policy:
         condition: any
 
@@ -61,3 +68,4 @@ volumes:
 networks:
   ${DESIRED_NETWORK}:
     external: true
+    driver: overlay
